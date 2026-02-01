@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Dialer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dialer">
+            <div class="display">
+                <input type="text" id="codeDisplay" class="code-input" placeholder="Enter code" readonly>
+            </div>
+            
+            <div class="keypad">
+                <button class="key" data-number="1">1</button>
+                <button class="key" data-number="2">2</button>
+                <button class="key" data-number="3">3</button>
+                <button class="key" data-number="4">4</button>
+                <button class="key" data-number="5">5</button>
+                <button class="key" data-number="6">6</button>
+                <button class="key" data-number="7">7</button>
+                <button class="key" data-number="8">8</button>
+                <button class="key" data-number="9">9</button>
+                <button class="key" data-number="0">0</button>
+            </div>
+            
+            <div class="controls">
+                <button id="clearBtn" class="control-btn clear">Clear</button>
+                <button id="callBtn" class="control-btn call">Call</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" style="display: none;"></audio>
+
+    <script>
+        const codeDisplay = document.getElementById('codeDisplay');
+        const keyButtons = document.querySelectorAll('.key');
+        const clearBtn = document.getElementById('clearBtn');
+        const callBtn = document.getElementById('callBtn');
+        const audioPlayer = document.getElementById('audioPlayer');
+        
+        let enteredCode = '';
+
+        // Handle number button clicks
+        keyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const number = button.getAttribute('data-number');
+                enteredCode += number;
+                codeDisplay.value = enteredCode;
+                playTone(number);
+            });
+        });
+
+        // Clear button
+        clearBtn.addEventListener('click', () => {
+            enteredCode = '';
+            codeDisplay.value = '';
+            audioPlayer.pause();
+        });
+
+        // Call button - plays audio file based on entered code
+        callBtn.addEventListener('click', () => {
+            if (enteredCode) {
+                playAudio(enteredCode);
+            } else {
+                alert('Please enter a code first');
+            }
+        });
+
+        // Play tone when button is pressed
+        function playTone(number) {
+            console.log('Button pressed: ' + number);
+        }
+
+        // Play audio file based on code
+        function playAudio(code) {
+            const audioPath = `audio/${code}.mp3`;
+            console.log('Attempting to play:', audioPath);
+            
+            audioPlayer.src = audioPath;
+            audioPlayer.volume = 1;
+            
+            audioPlayer.onloadstart = () => {
+                console.log('Loading audio...');
+            };
+            
+            audioPlayer.oncanplay = () => {
+                console.log('Audio can play');
+            };
+            
+            audioPlayer.onerror = (error) => {
+                console.error('Audio error:', error);
+                console.error('Failed to load:', audioPath);
+                alert('Could not find audio file: ' + audioPath);
+            };
+            
+            audioPlayer.onplay = () => {
+                console.log('Audio playing');
+            };
+            
+            const playPromise = audioPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('Playback started successfully');
+                    })
+                    .catch(error => {
+                        console.error('Playback failed:', error);
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
